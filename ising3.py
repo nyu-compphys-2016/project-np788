@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 J = 1.0  
 L = 100
 nsweep = 1000
+
 N = L**2
-kT = np.arange(0.1, 5.0, 0.05)
+kT = np.arange(3.269, 3.79)
 e = np.zeros(len(kT))
 m = np.zeros(len(kT))
 c = np.zeros(len(kT))
@@ -15,19 +16,17 @@ c = np.zeros(len(kT))
 s = np.ones((L, L))
 E = 0.0
 M = 0.0
+em = []
 for i in range(L):
     for j in range(L):
         E -= J*s[i,j]*(s[(i+1)%L,j]+s[i,(j+1)%L])
         M += s[i,j]
 
 for t in range(len(kT)):
-    pylab.ion()
-    image = plt.pcolormesh(s, cmap='bwr', vmax=1, vmin=-1)
+
     for sweep in range(nsweep):
         print("Now on sweep ",t, sweep) 
-        plt.title('Temperature = %g'%kT[t])
-        plt.draw()
-        plt.show()
+
 
         # sweep over all particles in lattice
         for i in range(L):
@@ -48,32 +47,14 @@ for t in range(len(kT)):
         e[t] += deltae/(sweep+1)
         m[t] += deltam/(sweep+1)
         c[t] += deltae*(E-e[t])
+        em.append(m[-1])
     e[t] /= N
     m[t] /= N
     c[t] /= nsweep*N*kT[t]**2
-    pylab.ioff()
-    plt.savefig("frame" + str(t) + ".png")
 plt.figure()
-plt.plot((2.269, 2.269), (-2.0, -0.4), label = '$T_C = 2.269$')
-plt.plot(kT, e, 'o', label = 'Energy')
-plt.title('Energy as temp increases')
-plt.xlabel('Temperature ($J/k_B$)')
-plt.ylabel('Energy per atom ($J$)')
-plt.legend()
-plt.grid()
-plt.figure()
-plt.plot((2.269, 2.269), (-0.2, 1.0), label = '$T_C = 2.269$')
-plt.plot(kT, m, 'o', label = 'Magnetization')
-plt.title('Magnetization as temp increases')
-plt.xlabel('Temperature ($J/k_B$)')
-plt.ylabel('Magnetization per atom ($J/\mu$)')
-plt.legend()
-plt.grid()
-plt.figure()
-plt.plot((2.269, 2.269), (0.0, 4.0), label = '$T_C = 2.269$')
-plt.plot(kT, c, 'o', label = 'Specific heat')
-plt.xlabel('Temperature ($J/k_B$)')
-plt.ylabel('Specific heat per atom ($J/k_B^2$)')
-plt.legend()
-plt.grid()
+plt.plot(np.arange(0,nsweep), em)
+plt.xlabel('Number of sweeps')
+plt.ylabel('Magnetization ($J/\mu$)')
+plt.title('Magnetization as a function of sweeps at T = 3.269')
 plt.show()
+
